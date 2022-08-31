@@ -3,11 +3,19 @@
     --base-height: 500px;
 }
 
+body {
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+    grid-template-rows: 25% 25% 25% 25%;
+    height: 100vh;
+}
+
 #app {
     width: var(--base-width);
     height: var(--base-height);
-    margin: auto;
     padding-bottom: 2.5rem;
+    grid-column: 2 / 4;
+    justify-self: center;
 }
 
 #app.is-dark {
@@ -19,4 +27,11 @@
     height:100%;
     display: grid;
     background-color: #fff;
+}
+
+footer {
+    text-align: center;
+    grid-column: 1 / -1;
+    grid-row: 4 / -1;
+    align-self: end;
 }
