@@ -1,13 +1,25 @@
-const appContainerElement = document.querySelector('#app')
-const etchContainerElement = document.createElement('div')
-const GRIDSIZE = 64
-const BLACK = '#000'
-let mouse
+const settings = {
+  gridsize: 16,
+  colors: {
+    black: '#000'
+  }
+}
+
+const elements = {
+  appContainer: document.querySelector('#app'),
+  etchContainer: document.createElement('div'),
+  buttonsContainer: document.createElement('div'),
+  buttons: {},
+}
+
+const state = {
+  mouse: ''
+}
 
 document.addEventListener(
   'mouseup',
   () => {
-    mouse = 'UP'
+    state.mouse = 'UP'
   },
   false
 )
@@ -15,13 +27,29 @@ document.addEventListener(
 document.addEventListener(
   'mousedown',
   () => {
-    mouse = 'DOWN'
+    state.mouse = 'DOWN'
   },
   false
 )
 
-const changeBackgroundColor = (e, selectedColor = BLACK) => {
-  if (mouse === 'DOWN') e.target.style.backgroundColor = selectedColor
+const clearTheBoard = () => {
+  const pixels = document.querySelectorAll('.pixelgrid > div')
+  pixels.forEach((pixel) => {
+    pixel.style.backgroundColor = ''
+  })
+}
+
+const createButton = (text = '', cssClasses = [], onclickFn) => {
+  const button = document.createElement('button')
+  button.type = 'button'
+  button.classList.add(...cssClasses)
+  button.textContent = text
+  button.onclick = onclickFn
+  return button
+}
+
+const changeBackgroundColor = (e, selectedColor = settings.colors.black) => {
+  if (state.mouse === 'DOWN') e.target.style.backgroundColor = selectedColor
 }
 
 const createPixelGrid = (etchContainerElement, gridSize = 16) => {
@@ -37,11 +65,18 @@ const createPixelGrid = (etchContainerElement, gridSize = 16) => {
   return etchContainerElement
 }
 
-const createAndAppendEtchASketch = (gridSize = GRIDSIZE) => {
-  const pixelGrid = createPixelGrid(etchContainerElement, gridSize)
+const createAndAppendEtchASketch = (gridSize = settings.gridsize) => {
+  const pixelGrid = createPixelGrid(elements.etchContainer, gridSize) // should be refactored into elements
+  
+  elements.buttons.clearButton = createButton('Clear', ['nes-btn'], clearTheBoard)
 
-  etchContainerElement.classList.add('pixelgrid')
-  appContainerElement.appendChild(pixelGrid)
+  elements.etchContainer.classList.add('pixelgrid')
+  
+  elements.buttonsContainer.classList.add('buttons')
+  elements.buttonsContainer.appendChild(elements.buttons.clearButton)
+  
+  elements.appContainer.appendChild(pixelGrid)
+  elements.appContainer.appendChild(elements.buttonsContainer)
 }
 
 createAndAppendEtchASketch()
