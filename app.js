@@ -1,8 +1,6 @@
 const settings = {
   gridsize: 16,
-  colors: {
-    black: '#000',
-  },
+  color: '#000',
 }
 
 const elements = {
@@ -14,6 +12,7 @@ const elements = {
 
 const state = {
   mouse: '',
+  color: 'DEFAULT',
 }
 
 document.addEventListener(
@@ -41,11 +40,24 @@ const clearTheBoard = () => {
 
 const resetBoardSize = () => {
   clearTheBoard()
-  const newBoardSize = parseInt(prompt('Enter neu Boardsize (max. 100)'))
+  settings.gridsize = parseInt(prompt('Enter neu Boardsize (max. 100)'))
   elements.etchContainer.childNodes.forEach((child) => {
     child.remove()
   })
-  elements.appContainer.appendChild(createPixelGrid(elements.etchContainer, newBoardSize))
+  elements.appContainer.appendChild(createPixelGrid(elements.etchContainer, settings.gridsize))
+}
+
+function getRandomColor() {
+  const letters = '0123456789ABCDEF'
+  let color = '#'
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)]
+  }
+  return color
+}
+
+const setColorToRandom = () => {
+  state.color = 'RANDOM'
 }
 
 const createCustomElement = (
@@ -65,18 +77,27 @@ const createCustomElement = (
   return element
 }
 
-const changeBackgroundColor = (e, selectedColor = settings.colors.black) => {
-  if (state.mouse === 'DOWN') e.target.style.backgroundColor = selectedColor
+const changePixelBackgroundColor = (e) => {
+  if (state.mouse === 'DOWN') {
+    if (state.color === 'DEFAULT') e.target.style.backgroundColor = settings.color
+    if (state.color === 'RANDOM') e.target.style.backgroundColor = getRandomColor()
+  }
 }
 
-const createPixelGrid = (etchContainerElement, gridSize = 16) => {
-  gridSize = (gridSize > 100) ? 100 : gridSize
+const createPixelGrid = (etchContainerElement, gridSize = settings.gridsize) => {
+  gridSize = gridSize > 100 ? 100 : gridSize
   const cssGridSize = `repeat(${gridSize}, 1fr)`
   etchContainerElement.style.gridTemplateColumns = cssGridSize
   etchContainerElement.style.gridTemplateRows = cssGridSize
   for (let i = 0; i < gridSize * gridSize; i++) {
     const pixel = document.createElement('div')
-    pixel.addEventListener('mouseover', changeBackgroundColor, false)
+    pixel.addEventListener(
+      'mouseover',
+      (e) => {
+        changePixelBackgroundColor(e)
+      },
+      false
+    )
     etchContainerElement.appendChild(pixel)
   }
 
@@ -84,7 +105,6 @@ const createPixelGrid = (etchContainerElement, gridSize = 16) => {
 }
 
 const init = (gridSize = settings.gridsize) => {
-
   elements.buttons.clearButton = createCustomElement(
     'button',
     'button',
@@ -96,15 +116,33 @@ const init = (gridSize = settings.gridsize) => {
   elements.buttons.resetButton = createCustomElement(
     'button',
     'button',
-    'Reset',
+    'New Gridsize',
     undefined,
     ['nes-btn'],
     resetBoardSize
   )
+  elements.buttons.rainbowColorButton = createCustomElement(
+    'button',
+    'button',
+    'Random Color',
+    undefined,
+    ['nes-btn'],
+    setColorToRandom
+  )
+  elements.buttons.resetColor = createCustomElement(
+    'button',
+    'button',
+    'Reset Color',
+    undefined,
+    ['nes-btn'],
+    () => {
+      state.color = 'DEFAULT'
+    }
+  )
 
   elements.etchContainer.classList.add('pixelgrid')
   elements.buttonsContainer.classList.add('buttons')
-  
+
   Object.entries(elements.buttons).forEach((button) => {
     elements.buttonsContainer.appendChild(button[1]) // HTMLElement is on index 1 in array
   })
@@ -114,4 +152,3 @@ const init = (gridSize = settings.gridsize) => {
 }
 
 init()
-
