@@ -7,7 +7,6 @@ body {
     display: grid;
     grid-template-columns: 25% 25% 25% 25%;
     grid-template-rows: 25% 25% 25% 25%;
-    height: 100vh;
 }
 
 #app {
@@ -32,6 +31,8 @@ body {
 .buttons {
     margin-top: 4rem;
     display: flex;
+    flex-direction: column;
+    gap: 2rem;
     justify-content: space-around;
 }
 

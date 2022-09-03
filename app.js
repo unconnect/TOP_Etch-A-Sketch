@@ -1,8 +1,8 @@
 const settings = {
   gridsize: 16,
   colors: {
-    black: '#000'
-  }
+    black: '#000',
+  },
 }
 
 const elements = {
@@ -13,7 +13,7 @@ const elements = {
 }
 
 const state = {
-  mouse: ''
+  mouse: '',
 }
 
 document.addEventListener(
@@ -39,13 +39,30 @@ const clearTheBoard = () => {
   })
 }
 
-const createButton = (text = '', cssClasses = [], onclickFn) => {
-  const button = document.createElement('button')
-  button.type = 'button'
-  button.classList.add(...cssClasses)
-  button.textContent = text
-  button.onclick = onclickFn
-  return button
+const resetBoardSize = () => {
+  clearTheBoard()
+  const newBoardSize = parseInt(prompt('Enter neu Boardsize (max. 100)'))
+  elements.etchContainer.childNodes.forEach((child) => {
+    child.remove()
+  })
+  elements.appContainer.appendChild(createPixelGrid(elements.etchContainer, newBoardSize))
+}
+
+const createCustomElement = (
+  tagname,
+  type = '',
+  text = '',
+  id = '',
+  cssClasses = [],
+  onclickFn
+) => {
+  const element = document.createElement(tagname)
+  element.type = type
+  element.id = id
+  element.classList.add(...cssClasses)
+  element.textContent = text
+  element.onclick = onclickFn
+  return element
 }
 
 const changeBackgroundColor = (e, selectedColor = settings.colors.black) => {
@@ -53,10 +70,11 @@ const changeBackgroundColor = (e, selectedColor = settings.colors.black) => {
 }
 
 const createPixelGrid = (etchContainerElement, gridSize = 16) => {
+  gridSize = (gridSize > 100) ? 100 : gridSize
   const cssGridSize = `repeat(${gridSize}, 1fr)`
   etchContainerElement.style.gridTemplateColumns = cssGridSize
   etchContainerElement.style.gridTemplateRows = cssGridSize
-  for (let i = 0; i < (gridSize * gridSize); i++) {
+  for (let i = 0; i < gridSize * gridSize; i++) {
     const pixel = document.createElement('div')
     pixel.addEventListener('mouseover', changeBackgroundColor, false)
     etchContainerElement.appendChild(pixel)
@@ -65,18 +83,35 @@ const createPixelGrid = (etchContainerElement, gridSize = 16) => {
   return etchContainerElement
 }
 
-const createAndAppendEtchASketch = (gridSize = settings.gridsize) => {
-  const pixelGrid = createPixelGrid(elements.etchContainer, gridSize) // should be refactored into elements
-  
-  elements.buttons.clearButton = createButton('Clear', ['nes-btn'], clearTheBoard)
+const init = (gridSize = settings.gridsize) => {
+
+  elements.buttons.clearButton = createCustomElement(
+    'button',
+    'button',
+    'Clear',
+    undefined,
+    ['nes-btn'],
+    clearTheBoard
+  )
+  elements.buttons.resetButton = createCustomElement(
+    'button',
+    'button',
+    'Reset',
+    undefined,
+    ['nes-btn'],
+    resetBoardSize
+  )
 
   elements.etchContainer.classList.add('pixelgrid')
-  
   elements.buttonsContainer.classList.add('buttons')
-  elements.buttonsContainer.appendChild(elements.buttons.clearButton)
   
-  elements.appContainer.appendChild(pixelGrid)
-  elements.appContainer.appendChild(elements.buttonsContainer)
+  Object.entries(elements.buttons).forEach((button) => {
+    elements.buttonsContainer.appendChild(button[1]) // HTMLElement is on index 1 in array
+  })
+
+  elements.appContainer.appendChild(createPixelGrid(elements.etchContainer, gridSize))
+  elements.appContainer.before(elements.buttonsContainer)
 }
 
-createAndAppendEtchASketch()
+init()
+
