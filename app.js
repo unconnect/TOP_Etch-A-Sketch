@@ -47,7 +47,7 @@ const resetBoardSize = () => {
   elements.appContainer.appendChild(createPixelGrid(elements.etchContainer, settings.gridsize))
 }
 
-function getRandomColor() {
+const getRandomColor = () => {
   const letters = '0123456789ABCDEF'
   let color = '#'
   for (var i = 0; i < 6; i++) {
@@ -56,9 +56,16 @@ function getRandomColor() {
   return color
 }
 
-const setColorToRandom = () => {
-  state.color = 'RANDOM'
-}
+// The best solution is problably this one: https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+// but I try it myself and simpler
+const getDarkenRGBColor = (shadingValue, currentBackgroundColorStyle) => {
+  const colorRegEx = /rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/
+  // value at index 0 is the complete string, then the capture groups are following
+  const [_, r, g, b] = currentBackgroundColorStyle.match(colorRegEx) || ['', 255, 255, 255]
+  return `rgb(${parseInt(r) + shadingValue}, ${parseInt(g) + shadingValue}, ${
+    parseInt(b) + shadingValue
+  })`
+} 
 
 const createCustomElement = (
   tagname,
@@ -81,6 +88,7 @@ const changePixelBackgroundColor = (e) => {
   if (state.mouse === 'DOWN') {
     if (state.color === 'DEFAULT') e.target.style.backgroundColor = settings.color
     if (state.color === 'RANDOM') e.target.style.backgroundColor = getRandomColor()
+    if (state.color === 'FADE') e.target.style.backgroundColor = getDarkenRGBColor(-10, e.target.style.backgroundColor)
   }
 }
 
@@ -124,21 +132,34 @@ const init = (gridSize = settings.gridsize) => {
   elements.buttons.rainbowColorButton = createCustomElement(
     'button',
     'button',
-    'Random Color',
+    'Color Rainbow',
     undefined,
     ['nes-btn'],
-    setColorToRandom
+    () => {
+      state.color = 'RANDOM'
+    }
   )
   elements.buttons.resetColor = createCustomElement(
     'button',
     'button',
-    'Reset Color',
+    'Color Black',
     undefined,
     ['nes-btn'],
     () => {
       state.color = 'DEFAULT'
     }
   )
+  elements.buttons.fadeColorDark = createCustomElement(
+    'button',
+    'button',
+    'Color Fade Darker',
+    undefined,
+    ['nes-btn'],
+    () => {
+      state.color = 'FADE'
+    }
+  )
+
 
   elements.etchContainer.classList.add('pixelgrid')
   elements.buttonsContainer.classList.add('buttons')
