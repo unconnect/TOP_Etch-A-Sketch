@@ -88,7 +88,7 @@ const changePixelBackgroundColor = (e) => {
   if (state.mouse === 'DOWN') {
     if (state.color === 'DEFAULT') e.target.style.backgroundColor = settings.color
     if (state.color === 'RANDOM') e.target.style.backgroundColor = getRandomColor()
-    if (state.color === 'FADE') e.target.style.backgroundColor = getDarkenRGBColor(-10, e.target.style.backgroundColor)
+    if (state.color === 'FADE') e.target.style.backgroundColor = getDarkenRGBColor(-25.5, e.target.style.backgroundColor)
   }
 }
 
