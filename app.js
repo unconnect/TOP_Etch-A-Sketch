@@ -40,7 +40,7 @@ const clearTheBoard = () => {
 
 const resetBoardSize = () => {
   clearTheBoard()
-  settings.gridsize = parseInt(prompt('Enter neu Boardsize (max. 100)'))
+  settings.gridsize = parseInt(prompt('Enter new boardsize (max. 100)')) || settings.gridsize
   elements.etchContainer.childNodes.forEach((child) => {
     child.remove()
   })
